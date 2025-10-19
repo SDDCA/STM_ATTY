@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhe do Processo - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .processo-header {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .acao-rapida {
+            transition: all 0.3s ease;
+        }
+        .acao-rapida:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .anotacao-item {
+            border-left: 4px solid #007bff;
+            transition: all 0.3s ease;
+        }
+        .anotacao-item:hover {
+            border-left-color: #0056b3;
+            background-color: #f8f9fa;
+        }
+        .documento-item:hover {
+            background-color: #f8f9fa;
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+        }
+        .timeline-content {
+            padding-left: 1rem;
+        }
+        .bg-andamento { background-color: #ffc107; }
+        .bg-concluido { background-color: #198754; }
+        .bg-arquivado { background-color: #6c757d; }
+        .bg-peticao { background-color: #0dcaf0; }
+        .bg-decisao { background-color: #6610f2; }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/clientes"><i class="bi bi-people-fill"></i> Clientes</a>
+        <a href="/processos"><i class="bi bi-folder2-open"></i> Processos</a>
+        <a href="/agenda"><i class="bi bi-calendar-event"></i> Agenda</a>
+        <a href="/perfil"><i class="bi bi-person-badge"></i> Perfil</a>
+        <a href="/auditoria"><i class="bi bi-shield-check"></i> Auditoria</a>
+        <a href="#" onclick="fazerLogout(event)"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span>Olá, {usuario.nome}</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <!-- Cabeçalho e Ações Rápidas -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1"><i class="bi bi-folder2-open"></i> Detalhe do Processo</h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/processos">Processos</a></li>
+                            <li class="breadcrumb-item active">Detalhe</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/processos" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                    <button class="btn btn-success" onclick="imprimirProcesso()">
+                        <i class="bi bi-printer"></i> Imprimir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Card Principal do Processo -->
+            <div class="card mb-4">
+                <div class="processo-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 id="numeroProcesso" class="mb-2">{processo.numero}</h3>
+                            <p class="mb-1 fs-5" id="clienteProcesso">{processo.cliente}</p>
+                            <p class="mb-0 opacity-75" id="descricaoResumida">
+                                {#if processo.descricao.length > 100}
+                                {processo.descricao.substring(0, 100)}...
+                                {#else}
+                                {processo.descricao}
+                                {/if}
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge status-badge bg-light text-dark fs-6" id="statusProcesso">
+                                {#if processo.status == 'EM_ANDAMENTO'}
+                                    Em Andamento
+                                {#else if processo.status == 'CONCLUIDO'}
+                                    Concluído
+                                {#else if processo.status == 'ARQUIVADO'}
+                                    Arquivado
+                                {#else}
+                                    {processo.status}
+                                {/if}
+                            </span>
+                            <div class="mt-3">
+                                <small>Criado em: {processo.dataCriacao}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Ações Rápidas -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-3">
+                                <button class="btn btn-warning acao-rapida" onclick="editarProcesso()">
+                                    <i class="bi bi-pencil"></i> Editar Processo
+                                </button>
+                                <button class="btn btn-danger acao-rapida" onclick="excluirProcesso()">
+                                    <i class="bi bi-trash"></i> Excluir Processo
+                                </button>
+                                <select class="form-select w-auto acao-rapida" id="selectStatus" onchange="mudarStatusProcesso(this.value)">
+                                    <option value="EM_ANDAMENTO" {#if processo.status =='EM_ANDAMENTO'}selected{/if}>Em Andamento</option>
+                                    <option value="CONCLUIDO" {#if processo.status =='CONCLUIDO'}selected{/if}>Concluído</option>
+                                    <option value="ARQUIVADO" {#if processo.status =='ARQUIVADO'}selected{/if}>Arquivado</option>
+                                </select>
+                                <button class="btn btn-info acao-rapida" onclick="abrirModalUpload()">
+                                    <i class="bi bi-upload"></i> Anexar Documento
+                                </button>
+                                <button class="btn btn-primary acao-rapida" onclick="abrirModalAnotacao()">
+                                    <i class="bi bi-journal-plus"></i> Nova Anotação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Processo -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informações do Processo</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <strong><i class="bi bi-building"></i> Tribunal:</strong>
+                                            <div id="tribunalProcesso">TRT-7</div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong><i class="bi bi-gear"></i> Vara:</strong>
+                                            <div id="varaProcesso">2ª Vara do Trabalho</div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong><i class="bi bi-person-badge"></i> Advogado:</strong>
+                                            <div id="advogadoProcesso">Dr. Silva</div>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <strong><i class="bi bi-calendar-plus"></i> Data Criação:</strong>
+                                            <div id="dataCriacaoProcesso">{processo.dataCriacao}</div>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <strong><i class="bi bi-tag"></i> Tipo:</strong>
+                                            <div id="tipoProcesso">Trabalhista</div>
+                                        </div>
+                                        <div class="col-12">
+                                            <strong><i class="bi bi-card-text"></i> Descrição Completa:</strong>
+                                            <div class="mt-2 p-3 bg-light rounded" id="descricaoCompletaProcesso">
+                                                {processo.descricao}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-graph-up"></i> Andamento do Processo</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="timeline">
+                                        <div class="timeline-item mb-3">
+                                            <div class="timeline-marker bg-peticao"></div>
+                                            <div class="timeline-content">
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>Petição Inicial Protocolada</strong>
+                                                    <small class="text-muted">25/07/2025 14:30</small>
+                                                </div>
+                                                <p class="mb-1">Petição inicial protocolada com sucesso no tribunal</p>
+                                                <small class="text-muted">Por: Dr. Silva</small>
+                                            </div>
+                                        </div>
+                                        <div class="timeline-item mb-3">
+                                            <div class="timeline-marker bg-andamento"></div>
+                                            <div class="timeline-content">
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>Processo Cadastrado</strong>
+                                                    <small class="text-muted">{processo.dataCriacao} 10:15</small>
+                                                </div>
+                                                <p class="mb-1">Processo cadastrado no sistema</p>
+                                                <small class="text-muted">Por: Sistema</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Anotações e Documentos -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="bi bi-journal-text"></i> Anotações</h6>
+                                    <span class="badge bg-primary">2</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item anotacao-item px-0">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-0">Primeira Audiência</h6>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <p class="mb-2">Audiência marcada para 15/08/2025 às 14h. Cliente deve levar documentos comprobatórios.</p>
+                                            <div class="d-flex justify-content-between text-muted small">
+                                                <span>20/07/2025 16:45</span>
+                                                <span>Por: Dr. Silva</span>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item anotacao-item px-0">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="mb-0">Contato com Cliente</h6>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Editar</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <p class="mb-2">Cliente informou que possui testemunhas que podem confirmar as horas extras trabalhadas.</p>
+                                            <div class="d-flex justify-content-between text-muted small">
+                                                <span>18/07/2025 11:20</span>
+                                                <span>Por: Dr. Silva</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="bi bi-files"></i> Documentos</h6>
+                                    <span class="badge bg-primary">3</span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="list-group list-group-flush">
+                                        <div class="list-group-item documento-item px-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-file-pdf text-danger me-3 fs-5"></i>
+                                                    <div>
+                                                        <div class="fw-bold">Petição Inicial.pdf</div>
+                                                        <small class="text-muted">2.3 MB • 25/07/2025</small>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-download"></i> Download</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item documento-item px-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-file-text text-primary me-3 fs-5"></i>
+                                                    <div>
+                                                        <div class="fw-bold">Contrato de Honorários.docx</div>
+                                                        <small class="text-muted">1.1 MB • 20/07/2025</small>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-download"></i> Download</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="list-group-item documento-item px-0">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="bi bi-file-image text-success me-3 fs-5"></i>
+                                                    <div>
+                                                        <div class="fw-bold">Comprovantes.jpg</div>
+                                                        <small class="text-muted">4.7 MB • 18/07/2025</small>
+                                                    </div>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="bi bi-three-dots"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="bi bi-download"></i> Download</a></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash"></i> Excluir</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Nova Anotação -->
+<div class="modal fade" id="modalAnotacao" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nova Anotação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formAnotacao">
+                    <input type="hidden" id="anotacaoId">
+                    <div class="mb-3">
+                        <label for="tituloAnotacao" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="tituloAnotacao" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="conteudoAnotacao" class="form-label">Conteúdo</label>
+                        <textarea class="form-control" id="conteudoAnotacao" rows="5" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="salvarAnotacao()">Salvar Anotação</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Upload de Documento -->
+<div class="modal fade" id="modalUpload" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Anexar Documento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formUpload">
+                    <div class="mb-3">
+                        <label for="documentoFile" class="form-label">Selecionar Arquivo</label>
+                        <input type="file" class="form-control" id="documentoFile" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="documentoDescricao" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="documentoDescricao" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="fazerUpload()">Anexar Documento</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Variáveis globais
+    const processoId = new URLSearchParams(window.location.search).get('id');
+    let anotacaoEditando = null;
+
+    // Funções principais
+    function editarProcesso() {
+        window.location.href = '/processos/editar?id=' + processoId;
+    }
+
+    async function excluirProcesso() {
+        if (confirm('Tem certeza que deseja excluir este processo? Esta ação não pode ser desfeita.')) {
+            try {
+                const response = await fetch('/processos/' + processoId, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Processo excluído com sucesso!');
+                    window.location.href = '/processos';
+                } else {
+                    alert('Erro ao excluir processo');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir processo:', error);
+                alert('Erro ao excluir processo');
+            }
+        }
+    }
+
+    async function mudarStatusProcesso(novoStatus) {
+        try {
+            const response = await fetch('/processos/' + processoId + '/status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: novoStatus })
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Erro ao alterar status');
+            }
+        } catch (error) {
+            console.error('Erro ao alterar status:', error);
+            alert('Erro ao alterar status do processo');
+        }
+    }
+
+    // Funções de Anotações
+    function abrirModalAnotacao() {
+        anotacaoEditando = null;
+        document.getElementById('formAnotacao').reset();
+        document.getElementById('anotacaoId').value = '';
+
+        const modal = new bootstrap.Modal(document.getElementById('modalAnotacao'));
+        modal.show();
+    }
+
+    async function salvarAnotacao() {
+        const anotacao = {
+            titulo: document.getElementById('tituloAnotacao').value,
+            conteudo: document.getElementById('conteudoAnotacao').value
+        };
+
+        if (!anotacao.titulo || !anotacao.conteudo) {
+            alert('Por favor, preencha todos os campos da anotação!');
+            return;
+        }
+
+        try {
+            // Simular salvamento
+            alert('Anotação salva com sucesso! (Funcionalidade simulada)');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAnotacao'));
+            modal.hide();
+
+        } catch (error) {
+            console.error('Erro ao salvar anotação:', error);
+            alert('Erro ao salvar anotação');
+        }
+    }
+
+    // Funções de Documentos
+    function abrirModalUpload() {
+        document.getElementById('formUpload').reset();
+        const modal = new bootstrap.Modal(document.getElementById('modalUpload'));
+        modal.show();
+    }
+
+    async function fazerUpload() {
+        const descricao = document.getElementById('documentoDescricao').value;
+        const fileInput = document.getElementById('documentoFile');
+
+        if (!fileInput.files[0] || !descricao) {
+            alert('Por favor, selecione um arquivo e preencha a descrição!');
+            return;
+        }
+
+        try {
+            // Simular upload
+            alert('Documento anexado com sucesso! (Funcionalidade simulada)');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalUpload'));
+            modal.hide();
+
+        } catch (error) {
+            console.error('Erro ao fazer upload:', error);
+            alert('Erro ao fazer upload do documento');
+        }
+    }
+
+    // Funções auxiliares
+    function imprimirProcesso() {
+        window.print();
+    }
+
+    function fazerLogout(event) {
+        event.preventDefault();
+        if (confirm('Deseja realmente sair do sistema?')) {
+            window.location.href = '/logout';
+        }
+    }
+</script>
+</body>
+</html>

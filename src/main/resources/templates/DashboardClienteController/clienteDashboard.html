@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Cliente - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <a href="/dashboard-cliente" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/perfil"><i class="bi bi-person-badge"></i> Meu Perfil</a>
+        <a href="#" id="sairLink"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard-cliente">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span>Olá, {usuarioObj.nome}</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <h2 class="mb-4">Bem-vindo(a), {dados.nomeUsuario}!</h2>
+
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card text-bg-primary">
+                        <div class="card-body text-center">
+                            <i class="bi bi-folder2-open display-6 mb-2"></i>
+                            <h3 class="stats-number">{dados.totalProcessos}</h3>
+                            <p class="card-text mb-0">Meus Processos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-bg-success">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-check display-6 mb-2"></i>
+                            <h3 class="stats-number">{dados.compromissosHoje}</h3>
+                            <p class="card-text mb-0">Compromissos Hoje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-bg-warning">
+                        <div class="card-body text-center">
+                            <i class="bi bi-chat-dots display-6 mb-2"></i>
+                            <h3 class="stats-number">3</h3>
+                            <p class="card-text mb-0">Mensagens</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card text-bg-info">
+                        <div class="card-body text-center">
+                            <i class="bi bi-file-earmark-text display-6 mb-2"></i>
+                            <h3 class="stats-number">5</h3>
+                            <p class="card-text mb-0">Documentos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Meus Processos em Andamento</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Descrição</th>
+                                        <th>Status</th>
+                                        <th>Data de Criação</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {#for processo in processos}
+                                    <tr>
+                                        <td>{processo.numero}</td>
+                                        <td>{processo.descricao}</td>
+                                        <td>
+                                            {#if processo.status == 'EM_ANDAMENTO'}
+                                            <span class="badge bg-success">Em Andamento</span>
+                                            {#else}
+                                            <span class="badge bg-primary">Concluído</span>
+                                            {/if}
+                                        </td>
+                                        <td>{processo.dataCriacao}</td>
+                                    </tr>
+                                    {/for}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Próximos Compromissos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                {#for evento in eventos}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{evento.title}</h6>
+                                        <small class="text-muted">{evento.start.format('dd/MM/yyyy HH:mm')}</small>
+                                    </div>
+                                    <p class="mb-1">Duração: {evento.start.format('HH:mm')} - {evento.end.format('HH:mm')}</p>
+                                </div>
+                                {/for}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Meu Advogado</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img src="https://cdn-icons-png.flaticon.com/512/147/147144.png" alt="Advogado" class="rounded-circle mb-3" width="80" height="80">
+                            <h5>Dr. Arthur Silva</h5>
+                            <p class="text-muted">OAB 123456/DF</p>
+                            <p><i class="bi bi-telephone"></i> (61) 99999-0000</p>
+                            <p><i class="bi bi-envelope"></i> arthur.silva@email.com</p>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="enviarMensagemAdvogado()">
+                                <i class="bi bi-chat"></i> Enviar Mensagem
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">Ações Rápidas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="solicitarVideochamada()">
+                                    <i class="bi bi-camera-video"></i> Solicitar Videochamada
+                                </button>
+                                <button class="btn btn-outline-success" onclick="enviarDocumento()">
+                                    <i class="bi bi-upload"></i> Enviar Documento
+                                </button>
+                                <button class="btn btn-outline-info" onclick="verMensagens()">
+                                    <i class="bi bi-chat"></i> Ver Mensagens
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="atualizarPerfil()">
+                                    <i class="bi bi-person"></i> Atualizar Perfil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Funções do dashboard do cliente
+    function enviarMensagemAdvogado() {
+        alert('Abrindo chat com o advogado...');
+    }
+
+    function solicitarVideochamada() {
+        if (confirm('Deseja solicitar uma videochamada com seu advogado?')) {
+            alert('Solicitação enviada! O advogado será notificado.');
+        }
+    }
+
+    function enviarDocumento() {
+        alert('Abrindo upload de documentos...');
+    }
+
+    function verMensagens() {
+        alert('Abrindo mensagens...');
+    }
+
+    function atualizarPerfil() {
+        window.location.href = '/perfil';
+    }
+
+    document.getElementById('sairLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (confirm('Deseja realmente sair do sistema?')) {
+            // Limpa localStorage e redireciona para página de logout
+            localStorage.removeItem('jwt-token');
+            localStorage.removeItem('tipoUsuario');
+            localStorage.removeItem('usuario');
+            localStorage.removeItem('token');
+            window.location.href = '/logout';
+        }
+    });
+</script>
+</body>
+</html>

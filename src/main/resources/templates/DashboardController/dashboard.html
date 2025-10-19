@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --secondary: #3498DB;
+            --accent: #E74C3C;
+            --success: #27AE60;
+            --bg-dark: #1A252F;
+            --bg-light: #F8F9FA;
+            --sidebar-width: 280px;
+            --topbar-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--primary) 100%);
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .logo-text h4 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .logo-text p {
+            margin: 0;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        /* Menu Items */
+        .nav-menu {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.3rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1.2rem;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link i {
+            font-size: 1.3rem;
+            min-width: 25px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: white;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            padding-top: var(--topbar-height);
+        }
+
+        /* Topbar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--topbar-height);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 999;
+        }
+
+        .topbar-left h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            background: var(--bg-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            background: #e9ecef;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--accent));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue { background: #E3F2FD; color: #2196F3; }
+        .stat-icon.green { background: #E8F5E9; color: #4CAF50; }
+        .stat-icon.orange { background: #FFF3E0; color: #FF9800; }
+        .stat-icon.red { background: #FFEBEE; color: #F44336; }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            color: #757575;
+            font-size: 0.9rem;
+        }
+
+        .stat-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+        }
+
+        .stat-trend.up {
+            background: #E8F5E9;
+            color: #4CAF50;
+        }
+
+        .stat-trend.down {
+            background: #FFEBEE;
+            color: #F44336;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.9rem 1.5rem;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Content Cards */
+        .card-modern {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header-modern {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-header-modern h5 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        /* Table Modern */
+        .table-modern {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-modern thead th {
+            background: var(--bg-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .table-modern tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+        }
+
+        .table-modern tbody td {
+            padding: 1rem;
+            color: #424242;
+        }
+
+        .badge-modern {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-success { background: #E8F5E9; color: #4CAF50; }
+        .badge-warning { background: #FFF3E0; color: #FF9800; }
+        .badge-danger { background: #FFEBEE; color: #F44336; }
+        .badge-info { background: #E3F2FD; color: #2196F3; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .topbar {
+                left: 0;
+            }
+
+            .search-box input {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a href="/dashboard" class="logo">
+            <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo">
+            <div class="logo-text">
+                <h4>STM-ADV</h4>
+                <p>Gestão Jurídica</p>
+            </div>
+        </a>
+    </div>
+
+    <nav class="nav-menu" id="navMenu">
+        <!-- Menu será preenchido via JavaScript baseado no perfil -->
+    </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <h2>Dashboard</h2>
+        </div>
+        <div class="topbar-right">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Buscar processos, clientes..." id="globalSearch">
+            </div>
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div style="font-weight: 600; font-size: 0.9rem;" id="userName">Carregando...</div>
+                    <div style="font-size: 0.75rem; color: #757575;" id="userRole">...</div>
+                </div>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <!-- Preenchido via JavaScript -->
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions" id="quickActions">
+            <!-- Preenchido via JavaScript -->
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h5><i class="bi bi-folder2-open"></i> Processos Recentes</h5>
+                        <a href="/processos" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+                    </div>
+                    <div id="processosRecentes">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Carregando processos...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card-modern">
+                    <div class="card-header-modern">
+                        <h5><i class="bi bi-calendar-event"></i> Próximos Eventos</h5>
+                    </div>
+                    <div id="proximosEventos">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="mt-2 text-muted">Carregando agenda...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Configuração Global
+    const API_BASE = '';
+    let currentUser = null;
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', async () => {
+        await verificarAutenticacao();
+        await carregarDashboard();
+        hideLoading();
+    });
+
+    // Loading
+    function showLoading() {
+        document.getElementById('loadingOverlay').classList.remove('hidden');
+    }
+
+    function hideLoading() {
+        setTimeout(() => {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+        }, 500);
+    }
+
+    // Autenticação
+    async function verificarAutenticacao() {
+        const token = localStorage.getItem('jwtToken');
+        const usuario = localStorage.getItem('usuario');
+
+        if (!token || !usuario) {
+            window.location.href = '/login';
+            return;
+        }
+
+        currentUser = JSON.parse(usuario);
+        atualizarInterfaceUsuario();
+    }
+
+    function atualizarInterfaceUsuario() {
+        document.getElementById('userName').textContent = currentUser.nome;
+        document.getElementById('userRole').textContent = getPerfilDisplayName(currentUser.perfil);
+        document.getElementById('userAvatar').textContent = currentUser.nome.charAt(0).toUpperCase();
+
+        renderizarMenu();
+    }
+
+    function getPerfilDisplayName(perfil) {
+        const perfis = {
+            'MASTER': 'Administrador',
+            'ADVOGADO': 'Advogado',
+            'CLIENTE': 'Cliente'
+        };
+        return perfis[perfil] || perfil;
+    }
+
+    // Menu Dinâmico
+    function renderizarMenu() {
+        const perfil = currentUser.perfil;
+        const navMenu = document.getElementById('navMenu');
+
+        const menus = {
+            'MASTER': [
+                { icon: 'speedometer2', text: 'Dashboard', href: '/dashboard', active: true },
+                { icon: 'shield-check', text: 'Gestão de Usuários', href: '/admin/usuarios' },
+                { icon: 'clipboard-data', text: 'Auditoria', href: '/admin/auditoria' },
+                { icon: 'people-fill', text: 'Advogados Pendentes', href: '/admin/aprovacoes' },
+                { icon: 'gear', text: 'Configurações', href: '/admin/config' },
+                { icon: 'box-arrow-right', text: 'Sair', href: '#', onclick: 'fazerLogout()' }
+            ],
+            'ADVOGADO': [
+                { icon: 'speedometer2', text: 'Dashboard', href: '/dashboard', active: true },
+                { icon: 'people-fill', text: 'Clientes', href: '/clientes' },
+                { icon: 'folder2-open', text: 'Processos', href: '/processos' },
+                { icon: 'calendar-event', text: 'Agenda', href: '/agenda' },
+                { icon: 'chat-dots', text: 'Mensagens', href: '/mensagens' },
+                { icon: 'person-badge', text: 'Perfil', href: '/perfil' },
+                { icon: 'box-arrow-right', text: 'Sair', href: '#', onclick: 'fazerLogout()' }
+            ],
+            'CLIENTE': [
+                { icon: 'speedometer2', text: 'Dashboard', href: '/dashboard-cliente', active: true },
+                { icon: 'folder2-open', text: 'Meus Processos', href: '/cliente/processos' },
+                { icon: 'calendar-event', text: 'Minha Agenda', href: '/cliente/agenda' },
+                { icon: 'chat-dots', text: 'Mensagens', href: '/cliente/mensagens' },
+                { icon: 'file-earmark-text', text: 'Documentos', href: '/cliente/documentos' },
+                { icon: 'person-badge', text: 'Perfil', href: '/perfil' },
+                { icon: 'box-arrow-right', text: 'Sair', href: '#', onclick: 'fazerLogout()' }
+            ]
+        };
+
+        const menuItems = menus[perfil] || menus['CLIENTE'];
+
+        navMenu.innerHTML = menuItems.map(item => `
+                <div class="nav-item">
+                    <a href="${item.href}" class="nav-link ${item.active ? 'active' : ''}"
+                       ${item.onclick ? `onclick="${item.onclick}; return false;"` : ''}>
+                        <i class="bi bi-${item.icon}"></i>
+                        <span>${item.text}</span>
+                    </a>
+                </div>
+            `).join('');
+    }
+
+    // Dashboard
+    async function carregarDashboard() {
+        await Promise.all([
+            carregarEstatisticas(),
+            carregarAcoesRapidas(),
+            carregarProcessosRecentes(),
+            carregarProximosEventos()
+        ]);
+    }
+
+    async function carregarEstatisticas() {
+        const perfil = currentUser.perfil;
+        const statsGrid = document.getElementById('statsGrid');
+
+        // Dados mockados - substituir por API real
+        const stats = perfil === 'ADVOGADO' ? [
+            { number: '12', label: 'Processos Ativos', icon: 'folder2-open', color: 'blue', trend: '+2 este mês', trendUp: true },
+            { number: '8', label: 'Clientes Ativos', icon: 'people-fill', color: 'green', trend: '+1 este mês', trendUp: true },
+            { number: '3', label: 'Audiências Hoje', icon: 'calendar-event', color: 'orange', trend: 'Próxima às 14h', trendUp: false },
+            { number: '87%', label: 'Taxa de Sucesso', icon: 'graph-up', color: 'green', trend: '+5% este ano', trendUp: true }
+        ] : [
+            { number: '3', label: 'Meus Processos', icon: 'folder2-open', color: 'blue' },
+            { number: '2', label: 'Eventos Hoje', icon: 'calendar-event', color: 'orange' },
+            { number: '5', label: 'Documentos', icon: 'file-earmark-text', color: 'green' },
+            { number: '1', label: 'Mensagens', icon: 'chat-dots', color: 'red' }
+        ];
+
+        statsGrid.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-number">${stat.number}</div>
+                            <div class="stat-label">${stat.label}</div>
+                            ${stat.trend ? `<span class="stat-trend ${stat.trendUp ? 'up' : 'down'}">
+                                <i class="bi bi-${stat.trendUp ? 'arrow-up' : 'arrow-down'}"></i>
+                                ${stat.trend}
+                            </span>` : ''}
+                        </div>
+                        <div class="stat-icon ${stat.color}">
+                            <i class="bi bi-${stat.icon}"></i>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    async function carregarAcoesRapidas() {
+        const perfil = currentUser.perfil;
+        const quickActions = document.getElementById('quickActions');
+
+        const acoes = perfil === 'ADVOGADO' ? [
+            { icon: 'plus-circle', text: 'Novo Processo', href: '/processos/novo' },
+            { icon: 'person-plus', text: 'Novo Cliente', href: '/clientes/novo' },
+            { icon: 'calendar-plus', text: 'Agendar Evento', href: '/agenda' },
+            { icon: 'file-earmark-plus', text: 'Upload Documento', href: '#' }
+        ] : [
+            { icon: 'calendar-check', text: 'Ver Agenda', href: '/cliente/agenda' },
+            { icon: 'upload', text: 'Enviar Documento', href: '#' },
+            { icon: 'chat-left-text', text: 'Mensagem', href: '/cliente/mensagens' }
+        ];
+
+        quickActions.innerHTML = acoes.map(acao => `
+                <a href="${acao.href}" class="action-btn">
+                    <i class="bi bi-${acao.icon}"></i>
+                    ${acao.text}
+                </a>
+            `).join('');
+    }
+
+    async function carregarProcessosRecentes() {
+        // Simular chamada API
+        await delay(1000);
+
+        const processos = [
+            { numero: '0001234-56.2025.8.07.0001', cliente: 'João Silva', status: 'EM_ANDAMENTO', statusClass: 'warning', data: '15/01/2025' },
+            { numero: '0005678-90.2025.8.07.0002', cliente: 'Maria Santos', status: 'CONCLUIDO', statusClass: 'success', data: '20/02/2025' }
+        ];
+
+        document.getElementById('processosRecentes').innerHTML = `
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Cliente</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${processos.map(p => `
+                            <tr>
+                                <td><strong>${p.numero}</strong></td>
+                                <td>${p.cliente}</td>
+                                <td><span class="badge-modern badge-${p.statusClass}">${p.status}</span></td>
+                                <td>${p.data}</td>
+                                <td><a href="/processos/detalhe?id=${p.numero}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+    }
+
+    async function carregarProximosEventos() {
+        await delay(1000);
+
+        const eventos = [
+            { titulo: 'Audiência Trabalhista', horario: 'Hoje, 14:00', tipo: 'audiencia' },
+            { titulo: 'Reunião com Cliente', horario: 'Amanhã, 10:00', tipo: 'reuniao' }
+        ];
+
+        document.getElementById('proximosEventos').innerHTML = eventos.map(e => `
+                <div class="d-flex align-items-center gap-3 p-3 mb-2 rounded" style="background: #f8f9fa;">
+                    <div class="stat-icon blue" style="width: 40px; height: 40px; font-size: 1rem;">
+                        <i class="bi bi-${e.tipo === 'audiencia' ? 'briefcase' : 'people'}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div style="font-weight: 600; font-size: 0.9rem;">${e.titulo}</div>
+                        <div style="font-size: 0.8rem; color: #757575;">${e.horario}</div>
+                    </div>
+                </div>
+            `).join('');
+    }
+
+    // Busca Global
+    document.getElementById('globalSearch').addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        if (termo.length > 2) {
+            console.log('Buscando:', termo);
+            // Implementar busca
+        }
+    });
+
+    // Logout
+    function fazerLogout() {
+        if (confirm('Deseja realmente sair do sistema?')) {
+            localStorage.clear();
+            window.location.href = '/login';
+        }
+    }
+
+    // Utility
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function toggleUserMenu() {
+        // Implementar dropdown de usuário
+        console.log('Menu do usuário');
+    }
+</script>
+</body>
+</html>

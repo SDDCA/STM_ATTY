@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contato - STM-ADV</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    main {
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    h2 {
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      font-size: 1.4rem;
+    }
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    form label {
+      font-weight: 600;
+    }
+    footer a {
+      color: white;
+      text-decoration: none;
+      margin-right: 1rem;
+    }
+    footer a:last-child {
+      margin-right: 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <a class="navbar-brand d-flex align-items-center" href="http://localhost:8080">
+      <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2" style="height: 40px;">
+      <span>STM-ADV</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="http://localhost:8080">Início</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <h1>Contato</h1>
+  <p>Para dúvidas, suporte ou outras informações, preencha o formulário abaixo ou entre em contato pelos canais indicados.</p>
+
+  <form>
+    <div class="mb-3">
+      <label for="nome" class="form-label">Nome</label>
+      <input type="text" id="nome" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">E-mail</label>
+      <input type="email" id="email" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label for="mensagem" class="form-label">Mensagem</label>
+      <textarea id="mensagem" class="form-control" rows="5" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+  </form>
+
+  <section>
+    <h2>Outros Canais</h2>
+    <p><strong>E-mail:</strong> contato@stm-adv.com</p>
+    <p><strong>Telefone:</strong> (61) 99999-0000</p>
+    <p><strong>Endereço:</strong> Rua Exemplo, 123, Brasília - DF</p>
+  </section>
+
+  <br>
+
+</main>
+
+<footer class="bg-dark text-white text-center py-4 mt-auto shadow-sm">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-md-start">
+        <p class="mb-1">&copy; 2025 STM-ADV. Todos os direitos reservados.</p>
+        <small class="text-muted">Versão 1.0.0</small>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="http://localhost:8080/sobre" class="text-white text-decoration-none me-3">Sobre</a>
+        <a href="http://localhost:8080/contato" class="text-white text-decoration-none me-3">Contato</a>
+        <a href="http://localhost:8080/privacidade" class="text-white text-decoration-none">Política de Privacidade</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

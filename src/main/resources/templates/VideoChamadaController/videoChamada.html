@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videochamada - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .video-container {
+            background: #000;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .video-placeholder {
+            background: #1a1a1a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+        }
+        .controls {
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/clientes"><i class="bi bi-people-fill"></i> Clientes</a>
+        <a href="/processos"><i class="bi bi-folder2-open"></i> Processos</a>
+        <a href="/agenda"><i class="bi bi-calendar-event"></i> Agenda</a>
+        <a href="/perfil"><i class="bi bi-person-badge"></i> Perfil</a>
+        <a href="/auditoria"><i class="bi bi-shield-check"></i> Auditoria</a>
+        <a href="#" id="sairLink"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span id="userInfo">Carregando...</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Videochamada</h2>
+                <div>
+                    <button class="btn btn-outline-secondary me-2" onclick="voltarParaProcesso()">
+                        <i class="bi bi-arrow-left"></i> Voltar ao Processo
+                    </button>
+                    <button class="btn btn-success" onclick="iniciarChamada()">
+                        <i class="bi bi-camera-video"></i> Iniciar Chamada
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Sala de Videochamada</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="video-container">
+                                <div class="row g-0">
+                                    <div class="col-md-6">
+                                        <div class="video-placeholder">
+                                            <div class="text-center">
+                                                <i class="bi bi-camera-video-off display-1"></i>
+                                                <p class="mt-2">Sua câmera</p>
+                                                <small class="text-muted">Clique em "Iniciar Chamada"</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="video-placeholder">
+                                            <div class="text-center">
+                                                <i class="bi bi-person display-1"></i>
+                                                <p class="mt-2">Participante</p>
+                                                <small class="text-muted">Aguardando conexão...</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="controls">
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <button class="btn btn-outline-light" id="btnMicrofone" onclick="toggleMicrofone()">
+                                            <i class="bi bi-mic-fill"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" id="btnCamera" onclick="toggleCamera()">
+                                            <i class="bi bi-camera-video-fill"></i>
+                                        </button>
+                                        <button class="btn btn-danger" onclick="encerrarChamada()">
+                                            <i class="bi bi-telephone-fill"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" onclick="compartilharTela()">
+                                            <i class="bi bi-laptop"></i>
+                                        </button>
+                                        <button class="btn btn-outline-light" onclick="gravarChamada()">
+                                            <i class="bi bi-record-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Documentos da Sessão</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-file-pdf text-danger me-2"></i>
+                                    Petição Inicial - Processo 0001234-56.2025.8.07.0001.pdf
+                                    <span class="badge bg-primary float-end">Visualizar</span>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-file-text text-primary me-2"></i>
+                                    Contrato de Honorários.docx
+                                    <span class="badge bg-primary float-end">Visualizar</span>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-file-image text-success me-2"></i>
+                                    Evidências - Fotos.zip
+                                    <span class="badge bg-primary float-end">Visualizar</span>
+                                </a>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-upload"></i> Adicionar Documento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Informações da Chamada</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Processo:</strong>
+                                <p class="mb-1">0001234-56.2025.8.07.0001</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Cliente:</strong>
+                                <p class="mb-1">João Silva</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Advogado:</strong>
+                                <p class="mb-1">Dr. Arthur Silva</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Data/Hora:</strong>
+                                <p class="mb-1" id="dataHoraChamada">--/--/---- --:--</p>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Duração:</strong>
+                                <p class="mb-1" id="duracaoChamada">00:00:00</p>
+                            </div>
+                            <div>
+                                <strong>Status:</strong>
+                                <span class="badge bg-secondary" id="statusChamada">Não iniciada</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">Chat da Sessão</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chat-messages mb-3" id="chatMessages">
+                                <div class="text-center text-muted">
+                                    <small>Nenhuma mensagem ainda</small>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Digite uma mensagem..." id="mensagemChat">
+                                <button class="btn btn-primary" onclick="enviarMensagem()">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-dark text-white text-center py-4 mt-auto shadow-sm">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-md-start">
+                        <p class="mb-1">&copy; 2025 STM-ADV. Todos os direitos reservados.</p>
+                        <small class="text-muted">Versão 1.0.0</small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/sobre" class="text-white text-decoration-none me-3">Sobre</a>
+                        <a href="/contato" class="text-white text-decoration-none me-3">Contato</a>
+                        <a href="/privacidade" class="text-white text-decoration-none">Política de Privacidade</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let chamadaAtiva = false;
+    let tempoInicio = null;
+    let intervaloDuracao = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        verificarAutenticacao();
+        atualizarDataHora();
+    });
+
+    function verificarAutenticacao() {
+        const usuario = localStorage.getItem('usuario');
+        if (!usuario) {
+            window.location.href = '/login';
+            return;
+        }
+        const usuarioObj = JSON.parse(usuario);
+        document.getElementById('userInfo').textContent = `Olá, ${usuarioObj.nome}`;
+    }
+
+    function atualizarDataHora() {
+        const agora = new Date();
+        document.getElementById('dataHoraChamada').textContent =
+            agora.toLocaleDateString('pt-BR') + ' ' + agora.toLocaleTimeString('pt-BR');
+    }
+
+    function iniciarChamada() {
+        if (chamadaAtiva) return;
+
+        chamadaAtiva = true;
+        tempoInicio = new Date();
+
+        document.getElementById('statusChamada').textContent = 'Em andamento';
+        document.getElementById('statusChamada').className = 'badge bg-success';
+
+        // Simular atualização de vídeo
+        document.querySelectorAll('.video-placeholder').forEach((placeholder, index) => {
+            placeholder.innerHTML = `
+        <div class="text-center text-success">
+          <i class="bi bi-camera-video display-1"></i>
+          <p class="mt-2">${index === 0 ? 'Sua câmera' : 'Participante'} - Conectado</p>
+          <small class="text-muted">Transmissão ao vivo</small>
+        </div>
+      `;
+        });
+
+        // Iniciar contador de duração
+        intervaloDuracao = setInterval(atualizarDuracao, 1000);
+
+        // Adicionar mensagem de sistema no chat
+        adicionarMensagemSistema('Chamada iniciada');
+
+        alert('Videochamada iniciada! Esta é uma demonstração. Em produção, seria integrado com WebRTC.');
+    }
+
+    function encerrarChamada() {
+        if (!chamadaAtiva) return;
+
+        chamadaAtiva = false;
+        clearInterval(intervaloDuracao);
+
+        document.getElementById('statusChamada').textContent = 'Encerrada';
+        document.getElementById('statusChamada').className = 'badge bg-secondary';
+
+        // Restaurar placeholders
+        document.querySelectorAll('.video-placeholder').forEach((placeholder, index) => {
+            placeholder.innerHTML = `
+        <div class="text-center">
+          <i class="bi bi-${index === 0 ? 'camera-video-off' : 'person'} display-1"></i>
+          <p class="mt-2">${index === 0 ? 'Sua câmera' : 'Participante'}</p>
+          <small class="text-muted">${index === 0 ? 'Clique em "Iniciar Chamada"' : 'Aguardando conexão...'}</small>
+        </div>
+      `;
+        });
+
+        adicionarMensagemSistema('Chamada encerrada');
+        alert('Chamada encerrada. Gravação salva no sistema.');
+    }
+
+    function atualizarDuracao() {
+        if (!tempoInicio) return;
+
+        const agora = new Date();
+        const diferenca = Math.floor((agora - tempoInicio) / 1000);
+
+        const horas = Math.floor(diferenca / 3600);
+        const minutos = Math.floor((diferenca % 3600) / 60);
+        const segundos = diferenca % 60;
+
+        document.getElementById('duracaoChamada').textContent =
+            `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    }
+
+    function toggleMicrofone() {
+        const btn = document.getElementById('btnMicrofone');
+        const estaAtivo = btn.classList.contains('btn-light');
+
+        if (estaAtivo) {
+            btn.className = 'btn btn-outline-light';
+            btn.innerHTML = '<i class="bi bi-mic-mute"></i>';
+        } else {
+            btn.className = 'btn btn-light';
+            btn.innerHTML = '<i class="bi bi-mic-fill"></i>';
+        }
+
+        adicionarMensagemSistema(`Microfone ${estaAtivo ? 'desativado' : 'ativado'}`);
+    }
+
+    function toggleCamera() {
+        const btn = document.getElementById('btnCamera');
+        const estaAtivo = btn.classList.contains('btn-light');
+
+        if (estaAtivo) {
+            btn.className = 'btn btn-outline-light';
+            btn.innerHTML = '<i class="bi bi-camera-video-off"></i>';
+        } else {
+            btn.className = 'btn btn-light';
+            btn.innerHTML = '<i class="bi bi-camera-video-fill"></i>';
+        }
+
+        adicionarMensagemSistema(`Câmera ${estaAtivo ? 'desativada' : 'ativada'}`);
+    }
+
+    function compartilharTela() {
+        adicionarMensagemSistema('Compartilhamento de tela iniciado');
+        alert('Compartilhamento de tela ativado! Em produção, usaria getDisplayMedia().');
+    }
+
+    function gravarChamada() {
+        adicionarMensagemSistema('Gravação da chamada iniciada');
+        alert('Gravação iniciada! A gravação será salva para fins de documentação.');
+    }
+
+    function adicionarMensagemSistema(mensagem) {
+        const chat = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.className = 'text-center text-muted mb-2';
+        div.innerHTML = `<small><i>${mensagem}</i></small>`;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+    function enviarMensagem() {
+        const input = document.getElementById('mensagemChat');
+        const mensagem = input.value.trim();
+
+        if (!mensagem) return;
+
+        const usuario = JSON.parse(localStorage.getItem('usuario'));
+        const chat = document.getElementById('chatMessages');
+
+        const div = document.createElement('div');
+        div.className = 'mb-2';
+        div.innerHTML = `
+      <strong>${usuario.nome}:</strong>
+      <span>${mensagem}</span>
+      <br>
+      <small class="text-muted">${new Date().toLocaleTimeString('pt-BR')}</small>
+    `;
+
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+        input.value = '';
+    }
+
+    function voltarParaProcesso() {
+        window.location.href = '/processos/detalhe';
+    }
+
+    // Logout
+    document.getElementById('sairLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('tipoUsuario');
+        window.location.href = '/login';
+    });
+
+    // Enter para enviar mensagem
+    document.getElementById('mensagemChat').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            enviarMensagem();
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .profile-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #0d6efd;
+        }
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+        .profile-role {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        .section {
+            margin-bottom: 2rem;
+        }
+        .section h4 {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 0.3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/clientes"><i class="bi bi-people-fill"></i> Clientes</a>
+        <a href="/processos"><i class="bi bi-folder2-open"></i> Processos</a>
+        <a href="/agenda"><i class="bi bi-calendar-event"></i> Agenda</a>
+        <a href="/perfil" class="active"><i class="bi bi-person-badge"></i> Perfil</a>
+        <a href="/auditoria"><i class="bi bi-shield-check"></i> Auditoria</a>
+        <a href="#" id="sairLink"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span id="userInfo">Carregando...</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <div class="profile-header">
+                <img src="https://cdn-icons-png.flaticon.com/512/147/147144.png" alt="Foto do usuário" class="profile-photo" />
+                <div>
+                    <h1 class="profile-name" id="profileName">Dr. Arthur</h1>
+                    <p class="profile-role" id="profileRole">Advogado - OAB 123456</p>
+                    <p><i class="bi bi-geo-alt-fill"></i> <span id="profileLocation">Brasília, DF</span></p>
+                    <p><i class="bi bi-envelope-fill"></i> <span id="profileEmail">arthur.silva@email.com</span></p>
+                    <p><i class="bi bi-telephone-fill"></i> <span id="profilePhone">(61) 99999-0000</span></p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Informações Pessoais</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="formPerfil">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputNome" class="form-label">Nome Completo</label>
+                                        <input type="text" class="form-control" id="inputNome" value="Dr. Arthur Silva">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputOAB" class="form-label">OAB</label>
+                                        <input type="text" class="form-control" id="inputOAB" value="123456/DF">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputEmail" class="form-label">E-mail</label>
+                                        <input type="email" class="form-control" id="inputEmail" value="arthur.silva@email.com">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="inputTelefone" class="form-label">Telefone</label>
+                                        <input type="tel" class="form-control" id="inputTelefone" value="(61) 99999-0000">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="inputEndereco" class="form-label">Endereço</label>
+                                    <input type="text" class="form-control" id="inputEndereco" value="Rua Exemplo, 123 - Brasília/DF">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="inputEspecialidade" class="form-label">Especialidade</label>
+                                    <input type="text" class="form-control" id="inputEspecialidade" value="Direito Trabalhista e Civil">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Experiência Profissional</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <strong>Escritório Silva & Associados</strong>
+                                <p class="mb-1">Advogado Sênior (2018 - Presente)</p>
+                                <small class="text-muted">Atuação em casos complexos de direito trabalhista e civil</small>
+                            </div>
+                            <div class="mb-3">
+                                <strong>Defensoria Pública do Distrito Federal</strong>
+                                <p class="mb-1">Advogado (2013 - 2018)</p>
+                                <small class="text-muted">Atendimento jurídico gratuito à população carente</small>
+                            </div>
+                            <div>
+                                <strong>Estagiário em Direito</strong>
+                                <p class="mb-1">Tribunal Regional do Trabalho (2010 - 2013)</p>
+                                <small class="text-muted">Auxílio na análise de processos trabalhistas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Estatísticas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <h3>12</h3>
+                                <p class="text-muted">Processos Ativos</p>
+                            </div>
+                            <div class="text-center mb-3">
+                                <h3>8</h3>
+                                <p class="text-muted">Clientes Ativos</p>
+                            </div>
+                            <div class="text-center">
+                                <h3>87%</h3>
+                                <p class="text-muted">Taxa de Sucesso</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">Contatos</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><i class="bi bi-linkedin"></i>
+                                <a href="https://www.linkedin.com/in/arthurcastro" target="_blank" rel="noopener">
+                                    linkedin.com/in/arthurcastro
+                                </a>
+                            </p>
+                            <p><i class="bi bi-globe"></i>
+                                <a href="https://www.stm-adv.com" target="_blank" rel="noopener">
+                                    www.stm-adv.com
+                                </a>
+                            </p>
+                            <p><i class="bi bi-instagram"></i>
+                                <a href="https://www.instagram.com/arthuradv" target="_blank" rel="noopener">
+                                    @arthuradv
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-dark text-white text-center py-4 mt-auto shadow-sm">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-md-start">
+                        <p class="mb-1">&copy; 2025 STM-ADV. Todos os direitos reservados.</p>
+                        <small class="text-muted">Versão 1.0.0</small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/sobre" class="text-white text-decoration-none me-3">Sobre</a>
+                        <a href="/contato" class="text-white text-decoration-none me-3">Contato</a>
+                        <a href="/privacidade" class="text-white text-decoration-none">Política de Privacidade</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        verificarAutenticacao();
+        carregarDadosPerfil();
+    });
+
+    function verificarAutenticacao() {
+        const usuario = localStorage.getItem('usuario');
+        if (!usuario) {
+            window.location.href = '/login';
+            return;
+        }
+        const usuarioObj = JSON.parse(usuario);
+        document.getElementById('userInfo').textContent = `Olá, ${usuarioObj.nome}`;
+    }
+
+    function carregarDadosPerfil() {
+        const usuario = localStorage.getItem('usuario');
+        if (usuario) {
+            const usuarioObj = JSON.parse(usuario);
+            document.getElementById('profileName').textContent = usuarioObj.nome;
+            document.getElementById('profileEmail').textContent = usuarioObj.email;
+        }
+    }
+
+    document.getElementById('formPerfil').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Perfil atualizado com sucesso!');
+    });
+
+    // Logout
+    document.getElementById('sairLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('tipoUsuario');
+        window.location.href = '/login';
+    });
+</script>
+</body>
+</html>

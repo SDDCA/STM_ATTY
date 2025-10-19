@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STM-ADV - Gestão Jurídica Inteligente</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .carousel-item img {
+      object-fit: cover;
+      height: 550px;
+    }
+    .navbar-brand img {
+      height: 40px;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+<header class="shadow-sm">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="http://localhost:8080">
+        <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+        <span>STM-ADV</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="http://localhost:8080/login">Entrar</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light ms-lg-2" href="http://localhost:8080/cadastro">Criar Conta</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="flex-grow-1">
+  <div id="carouselInformativo" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="https://www.forensicfocus.com/stable/wp-content/uploads/2022/05/marchresearch.png" class="d-block w-100" alt="Justiça">
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+          <h5>Simplifique sua rotina jurídica</h5>
+          <p>Com tecnologia e organização em um só lugar.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="https://i.pinimg.com/originals/04/6b/c4/046bc49f47fe5d67c948ef31a43fe00f.jpg" class="d-block w-100" alt="Advogados">
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+          <h5>Conecte-se com seus clientes</h5>
+          <p>Perfil profissional, comunicação e histórico unificados.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="https://learningforward.org/wp-content/uploads/2021/10/Gettycalendar-1176929577-1.jpeg" class="d-block w-100" alt="Agenda">
+        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+          <h5>Tenha controle total da sua agenda</h5>
+          <p>Reuniões e audiências organizadas e notificadas.</p>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselInformativo" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselInformativo" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Próximo</span>
+    </button>
+  </div>
+
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-4">Por que escolher o STM-ADV?</h2>
+      <div class="row text-center">
+        <div class="col-md-4">
+          <h4 class="text-primary">📂 Gestão de Processos</h4>
+          <p>Acompanhe todos os seus casos em um ambiente centralizado e seguro.</p>
+        </div>
+        <div class="col-md-4">
+          <h4 class="text-primary">📅 Agenda Integrada</h4>
+          <p>Visualize compromissos, audiências e reuniões em tempo real.</p>
+        </div>
+        <div class="col-md-4">
+          <h4 class="text-primary">👨‍⚖️ Perfil Profissional</h4>
+          <p>Construa uma reputação sólida com informações atualizadas e acessíveis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-5">
+    <div class="container text-center">
+      <h3 class="mb-4">Transforme sua forma de atuar com a tecnologia jurídica</h3>
+      <p class="lead">O STM-ADV oferece uma plataforma poderosa para otimizar a rotina de advogados e conectar clientes com eficiência e confiança.</p>
+      <a href="http://localhost:8080/cadastro" class="btn btn-primary btn-lg mt-3">Crie sua conta gratuitamente</a>
+    </div>
+  </section>
+</main>
+
+<footer class="bg-dark text-white text-center py-4 mt-auto shadow-sm">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 text-md-start">
+        <p class="mb-1">&copy; 2025 STM-ADV. Todos os direitos reservados.</p>
+        <small class="text-muted">Versão 1.0.0</small>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="http://localhost:8080/sobre" class="text-white text-decoration-none me-3">Sobre</a>
+        <a href="http://localhost:8080/contato" class="text-white text-decoration-none me-3">Contato</a>
+        <a href="http://localhost:8080/privacidade" class="text-white text-decoration-none">Política de Privacidade</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

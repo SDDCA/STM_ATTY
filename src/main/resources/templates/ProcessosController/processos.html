@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processos - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img { height: 40px; }
+        .badge-status { font-size: 0.8rem; }
+
+        /* FORÇA MENU PROCESSOS */
+        .sidebar a[href="/processos"] {
+            background-color: #343a40 !important;
+            color: #ffffff !important;
+        }
+
+        /* ESTILOS PARA LINHA CLICÁVEL */
+        .processo-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .processo-row:hover {
+            background-color: #f8f9fa !important;
+        }
+
+        .descricao-limitada {
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/clientes"><i class="bi bi-people-fill"></i> Clientes</a>
+        <a href="/processos"><i class="bi bi-folder2-open"></i> Processos</a>
+        <a href="/agenda"><i class="bi bi-calendar-event"></i> Agenda</a>
+        <a href="/perfil"><i class="bi bi-person-badge"></i> Perfil</a>
+        <a href="/auditoria"><i class="bi bi-shield-check"></i> Auditoria</a>
+        <a href="/logout" onclick="fazerLogout(event)"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span>Olá, {usuario.nome}</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-folder2-open"></i> Gerenciar Processos</h2>
+                <button class="btn btn-primary" onclick="novoProcesso()">
+                    <i class="bi bi-plus-circle"></i> Novo Processo
+                </button>
+            </div>
+
+            <!-- Tabela de Processos -->
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-list-ul"></i> Lista de Processos</span>
+                    <span class="badge bg-light text-dark">{processos.size} processos</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Número</th>
+                                <th>Cliente</th>
+                                <th>Descrição</th>
+                                <th>Status</th>
+                                <th>Data Criação</th>
+                                <th width="80">Detalhes</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {#for processo in processos}
+                            <tr class="processo-row" onclick="verDetalhes('{processo.id}')">
+                                <td><strong>{processo.numero}</strong></td>
+                                <td>{processo.cliente}</td>
+                                <td class="descricao-limitada" title="{processo.descricao}">
+                                    {processo.descricao}
+                                </td>
+                                <td>
+                                    {#if processo.status == 'EM_ANDAMENTO'}
+                                    <span class="badge bg-warning badge-status">Em Andamento</span>
+                                    {#else if processo.status == 'CONCLUIDO'}
+                                    <span class="badge bg-success badge-status">Concluído</span>
+                                    {#else if processo.status == 'ARQUIVADO'}
+                                    <span class="badge bg-secondary badge-status">Arquivado</span>
+                                    {#else}
+                                    <span class="badge bg-info badge-status">{processo.status}</span>
+                                    {/if}
+                                </td>
+                                <td>
+                                    {#if processo.dataCriacao}
+                                    {processo.dataCriacao}
+                                    {#else}
+                                    Não informada
+                                    {/if}
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); verDetalhes('{processo.id}')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {/for}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para Novo Processo -->
+<div class="modal fade" id="modalProcesso" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Novo Processo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formProcesso">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="processoNumero" class="form-label">Número do Processo *</label>
+                                <input type="text" class="form-control" id="processoNumero" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="processoCliente" class="form-label">Cliente *</label>
+                                <input type="text" class="form-control" id="processoCliente" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="processoDescricao" class="form-label">Descrição *</label>
+                        <textarea class="form-control" id="processoDescricao" rows="3" required></textarea>
+                    </div>
+                    <div class="text-muted">
+                        <small>* Campos obrigatórios</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="criarProcesso()">Criar Processo</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function verDetalhes(processoId) {
+        window.location.href = '/processos/detalhe?id=' + processoId;
+    }
+
+    function novoProcesso() {
+        document.getElementById('formProcesso').reset();
+        const modal = new bootstrap.Modal(document.getElementById('modalProcesso'));
+        modal.show();
+    }
+
+    async function criarProcesso() {
+        const processo = {
+            numero: document.getElementById('processoNumero').value,
+            cliente: document.getElementById('processoCliente').value,
+            descricao: document.getElementById('processoDescricao').value
+        };
+
+        // Validação
+        if (!processo.numero || !processo.cliente || !processo.descricao) {
+            alert('Por favor, preencha todos os campos obrigatórios!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/processos/novo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(processo)
+            });
+
+            if (response.ok) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('modalProcesso'));
+                modal.hide();
+                alert('Processo criado com sucesso!');
+                location.reload();
+            } else {
+                const error = await response.text();
+                alert('Erro ao criar processo: ' + error);
+            }
+        } catch (error) {
+            console.error('Erro ao criar processo:', error);
+            alert('Erro ao criar processo');
+        }
+    }
+
+    function fazerLogout(event) {
+        event.preventDefault();
+        if (confirm('Deseja realmente sair do sistema?')) {
+            window.location.href = '/logout';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria - STM-ADV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+            padding-top: 2rem;
+            width: 220px;
+        }
+        .sidebar a {
+            color: #ced4da;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+        .sidebar a i {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #ffffff;
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .log-item {
+            border-left: 4px solid #007bff;
+            padding-left: 1rem;
+            margin-bottom: 1rem;
+        }
+        .log-success { border-left-color: #28a745; }
+        .log-warning { border-left-color: #ffc107; }
+        .log-danger { border-left-color: #dc3545; }
+        .log-info { border-left-color: #17a2b8; }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <div class="sidebar">
+        <a href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="/clientes"><i class="bi bi-people-fill"></i> Clientes</a>
+        <a href="/processos"><i class="bi bi-folder2-open"></i> Processos</a>
+        <a href="/agenda"><i class="bi bi-calendar-event"></i> Agenda</a>
+        <a href="/perfil"><i class="bi bi-person-badge"></i> Perfil</a>
+        <a href="/auditoria" class="active"><i class="bi bi-shield-check"></i> Auditoria</a>
+        <a href="#" id="sairLink"><i class="bi bi-box-arrow-right"></i> Sair</a>
+    </div>
+
+    <div class="flex-grow-1 d-flex flex-column">
+        <header class="shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+                <a class="navbar-brand d-flex align-items-center" href="/dashboard">
+                    <img src="https://png.pngtree.com/png-clipart/20200710/original/pngtree-law-firm-logo-law-firm-logo-png-image_4148236.jpg" alt="Logo STM-ADV" class="me-2">
+                    <span>STM-ADV</span>
+                </a>
+                <div class="navbar-text ms-auto">
+                    <span id="userInfo">Carregando...</span>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container my-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Registro de Auditoria</h2>
+                <div>
+                    <button class="btn btn-outline-primary me-2" onclick="filtrarLogs('todos')">
+                        <i class="bi bi-filter"></i> Todos
+                    </button>
+                    <button class="btn btn-outline-success me-2" onclick="filtrarLogs('login')">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <button class="btn btn-outline-warning" onclick="filtrarLogs('alteracao')">
+                        <i class="bi bi-pencil"></i> Alterações
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Logs do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" id="searchLogs" class="form-control" placeholder="Buscar em logs..." onkeyup="filtrarLogs()">
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted" id="contadorLogs">Carregando...</small>
+                        </div>
+                    </div>
+
+                    <div id="listaLogs">
+                        <div class="text-center text-muted py-4">
+                            <i class="bi bi-clock-history display-4"></i>
+                            <p class="mt-2">Carregando logs de auditoria...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-bg-primary">
+                        <div class="card-body text-center">
+                            <i class="bi bi-activity display-6 mb-2"></i>
+                            <h3 id="totalLogs">0</h3>
+                            <p class="card-text mb-0">Total de Logs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-bg-success">
+                        <div class="card-body text-center">
+                            <i class="bi bi-person-check display-6 mb-2"></i>
+                            <h3 id="loginsHoje">0</h3>
+                            <p class="card-text mb-0">Logins Hoje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-bg-warning">
+                        <div class="card-body text-center">
+                            <i class="bi bi-pencil-square display-6 mb-2"></i>
+                            <h3 id="alteracoesHoje">0</h3>
+                            <p class="card-text mb-0">Alterações Hoje</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-bg-info">
+                        <div class="card-body text-center">
+                            <i class="bi bi-shield-check display-6 mb-2"></i>
+                            <h3 id="usuariosAtivos">0</h3>
+                            <p class="card-text mb-0">Usuários Ativos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-dark text-white text-center py-4 mt-auto shadow-sm">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 text-md-start">
+                        <p class="mb-1">&copy; 2025 STM-ADV. Todos os direitos reservados.</p>
+                        <small class="text-muted">Versão 1.0.0</small>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="/sobre" class="text-white text-decoration-none me-3">Sobre</a>
+                        <a href="/contato" class="text-white text-decoration-none me-3">Contato</a>
+                        <a href="/privacidade" class="text-white text-decoration-none">Política de Privacidade</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let todosLogs = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        verificarAutenticacao();
+        carregarLogs();
+    });
+
+    function verificarAutenticacao() {
+        const usuario = localStorage.getItem('usuario');
+        if (!usuario) {
+            window.location.href = '/login';
+            return;
+        }
+        const usuarioObj = JSON.parse(usuario);
+        document.getElementById('userInfo').textContent = `Olá, ${usuarioObj.nome}`;
+    }
+
+    async function carregarLogs() {
+        try {
+            const response = await fetch('/auditoria/logs');
+            if (response.ok) {
+                const logs = await response.json();
+                todosLogs = logs;
+                atualizarListaLogs(logs);
+                atualizarEstatisticas(logs);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar logs:', error);
+        }
+    }
+
+    function atualizarListaLogs(logs) {
+        const lista = document.getElementById('listaLogs');
+
+        if (logs.length === 0) {
+            lista.innerHTML = `
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-inbox display-4"></i>
+          <p class="mt-2">Nenhum log encontrado</p>
+        </div>
+      `;
+            return;
+        }
+
+        lista.innerHTML = '';
+
+        logs.forEach(log => {
+            const div = document.createElement('div');
+            div.className = `log-item ${getLogClass(log.acao)}`;
+
+            const dataHora = new Date(log.dataHora).toLocaleString('pt-BR');
+
+            div.innerHTML = `
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="flex-grow-1">
+            <strong>${log.usuario}</strong>
+            <span class="badge ${getBadgeClass(log.acao)} ms-2">${log.acao}</span>
+            <p class="mb-1 mt-1">${log.descricao}</p>
+            <small class="text-muted">${dataHora}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary ms-2" onclick="detalhesLog('${log.id}')">
+            <i class="bi bi-three-dots"></i>
+          </button>
+        </div>
+      `;
+
+            lista.appendChild(div);
+        });
+
+        document.getElementById('contadorLogs').textContent = `${logs.length} logs encontrados`;
+    }
+
+    function atualizarEstatisticas(logs) {
+        const hoje = new Date();
+        const hojeString = hoje.toDateString();
+
+        const loginsHoje = logs.filter(log =>
+            log.acao === 'LOGIN' && new Date(log.dataHora).toDateString() === hojeString
+        ).length;
+
+        const alteracoesHoje = logs.filter(log =>
+            (log.acao.includes('CRIAR') || log.acao.includes('EDITAR') || log.acao.includes('EXCLUIR')) &&
+            new Date(log.dataHora).toDateString() === hojeString
+        ).length;
+
+        const usuariosUnicos = [...new Set(logs.map(log => log.usuario))].length;
+
+        document.getElementById('totalLogs').textContent = logs.length;
+        document.getElementById('loginsHoje').textContent = loginsHoje;
+        document.getElementById('alteracoesHoje').textContent = alteracoesHoje;
+        document.getElementById('usuariosAtivos').textContent = usuariosUnicos;
+    }
+
+    function filtrarLogs(tipo = 'todos') {
+        let logsFiltrados = todosLogs;
+
+        if (tipo !== 'todos') {
+            if (tipo === 'login') {
+                logsFiltrados = logsFiltrados.filter(log => log.acao === 'LOGIN');
+            } else if (tipo === 'alteracao') {
+                logsFiltrados = logsFiltrados.filter(log =>
+                    log.acao.includes('CRIAR') || log.acao.includes('EDITAR') || log.acao.includes('EXCLUIR')
+                );
+            }
+        }
+
+        const termoBusca = document.getElementById('searchLogs').value.toLowerCase();
+        if (termoBusca) {
+            logsFiltrados = logsFiltrados.filter(log =>
+                log.usuario.toLowerCase().includes(termoBusca) ||
+                log.descricao.toLowerCase().includes(termoBusca) ||
+                log.acao.toLowerCase().includes(termoBusca)
+            );
+        }
+
+        atualizarListaLogs(logsFiltrados);
+    }
+
+    function getLogClass(acao) {
+        const classes = {
+            'LOGIN': 'log-success',
+            'CRIAR': 'log-info',
+            'EDITAR': 'log-warning',
+            'EXCLUIR': 'log-danger'
+        };
+        return classes[acao] || 'log-item';
+    }
+
+    function getBadgeClass(acao) {
+        const classes = {
+            'LOGIN': 'bg-success',
+            'CRIAR': 'bg-info',
+            'EDITAR': 'bg-warning',
+            'EXCLUIR': 'bg-danger'
+        };
+        return classes[acao] || 'bg-secondary';
+    }
+
+    function detalhesLog(id) {
+        const log = todosLogs.find(l => l.id === id);
+        if (log) {
+            const dataHora = new Date(log.dataHora).toLocaleString('pt-BR');
+            alert(`Detalhes do Log:\n\nUsuário: ${log.usuario}\nAção: ${log.acao}\nDescrição: ${log.descricao}\nData/Hora: ${dataHora}\nID: ${log.id}`);
+        }
+    }
+
+    // Logout
+    document.getElementById('sairLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('usuario');
+        localStorage.removeItem('tipoUsuario');
+        window.location.href = '/login';
+    });
+</script>
+</body>
+</html>
